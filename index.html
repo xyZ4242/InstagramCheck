@@ -1,8 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Instagram Unfollow Checker</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -12,9 +11,7 @@
       font-family: 'Poppins', sans-serif;
       background: #0e0e0e;
       color: #fff;
-      overflow-x: hidden;
     }
-
     header {
       padding: 20px;
       text-align: center;
@@ -24,16 +21,13 @@
       color: #fff;
       box-shadow: 0 4px 15px rgba(142, 45, 226, 0.4);
     }
-
     .container {
       max-width: 800px;
       margin: 40px auto;
       background: #1a1a1a;
       border-radius: 15px;
       padding: 20px;
-      box-shadow: 0 0 30px rgba(142, 45, 226, 0.2);
     }
-
     .upload-section {
       text-align: center;
       border: 2px dashed #8e2de2;
@@ -41,37 +35,22 @@
       border-radius: 10px;
       cursor: pointer;
       margin-bottom: 30px;
-      transition: background 0.3s;
     }
-
-    .upload-section:hover {
-      background: rgba(142, 45, 226, 0.05);
-    }
-
     input[type="file"] {
       display: none;
     }
-
     .results {
       margin-top: 20px;
     }
-
     .user-link {
       padding: 10px;
       border-bottom: 1px solid #333;
       font-size: 16px;
     }
-
     .user-link a {
       color: #ff5de6;
       text-decoration: none;
-      transition: color 0.3s;
     }
-
-    .user-link a:hover {
-      color: #c43ad6;
-    }
-
     .loader {
       border: 4px solid #333;
       border-top: 4px solid #8e2de2;
@@ -81,28 +60,19 @@
       animation: spin 1s linear infinite;
       margin: 20px auto;
     }
-
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
     footer {
       text-align: center;
       padding: 15px;
       margin-top: 40px;
       color: #aaa;
-      font-size: 14px;
     }
-
     footer a {
       color: #ff5de6;
       text-decoration: none;
-      margin-left: 5px;
-    }
-
-    footer a:hover {
-      color: #c43ad6;
     }
   </style>
 </head>
@@ -110,58 +80,44 @@
   <header>Instagram Unfollow Checker</header>
   <div class="container">
     <div class="upload-section" onclick="document.getElementById('fileInput').click()">
-      <p>📂 Click or Drop ZIP File (Instagram Data)</p>
-      <input type="file" id="fileInput" accept=".zip" onchange="handleFile(event)" />
+      <p>📂 Click to Upload ZIP File</p>
+      <input type="file" id="fileInput" accept=".zip" onchange="handleZip(event)" />
     </div>
     <div class="results" id="results"></div>
   </div>
-
   <footer>
-    made by 
-    <a href="https://instagram.com/savero_aja" target="_blank">
-      <img src="https://cdn-icons-png.flaticon.com/24/2111/2111463.png" width="16" style="vertical-align:middle; margin-right:4px;">
-      @savero_aja
+    made by <a href="https://instagram.com/savero_aja" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/24/2111/2111463.png" width="16" style="vertical-align:middle;"> @savero_aja
     </a>
   </footer>
-
   <script>
-    async function handleFile(event) {
+    async function handleZip(event) {
       const file = event.target.files[0];
       const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = `<p>Membaca file <b>${file.name}</b>...</p><div class="loader"></div>`;try {
+    const zip = await JSZip.loadAsync(file);
+    const followingHTML = await zip.file(/following\.html$/i)[0]?.async('string');
+    const followersHTML = await zip.file(/followers(_1)?\.html$/i)[0]?.async('string');
 
-      resultsDiv.innerHTML = `
-        <p style='color:#aaa;'>🔍 Membaca file <strong>${file.name}</strong>...</p>
-        <div class="loader"></div>
-      `;
+    if (!followingHTML || !followersHTML) {
+      resultsDiv.innerHTML = `<p style="color:red">File HTML tidak ditemukan.</p>`;
+      return;
+    }
 
-      const zip = await JSZip.loadAsync(file);
+    const parser = new DOMParser();
+    const docFollowing = parser.parseFromString(followingHTML, 'text/html');
+    const docFollowers = parser.parseFromString(followersHTML, 'text/html');
 
-      const followingFile = zip.file(/following\.json$/i)[0];
-      const followersFile = zip.file(/followers(_1)?\.json$/i)[0];
+    const following = [...docFollowing.querySelectorAll('a')].map(a => a.textContent.trim());
+    const followers = [...docFollowers.querySelectorAll('a')].map(a => a.textContent.trim());
 
-      if (!followingFile || !followersFile) {
-        resultsDiv.innerHTML = "<p style='color:red;'>❌ File tidak valid. Harus ada <code>following.json</code> dan <code>followers_1.json</code>.</p>";
-        return;
-      }
+    const notFollowBack = following.filter(u => !followers.includes(u));
 
-      const followingText = await followingFile.async("string");
-      const followersText = await followersFile.async("string");
+    resultsDiv.innerHTML = `<h3>🚫 Tidak Followback (${notFollowBack.length})</h3>`;
 
-      const followingData = JSON.parse(followingText);
-      const followersData = JSON.parse(followersText);
-
-      const following = followingData.relationships_following.map(user => user.string_list_data[0].value);
-      const followers = followersData.map(user => user.string_list_data[0].value);
-
-      const notFollowBack = following.filter(user => !followers.includes(user));
-
-      resultsDiv.innerHTML = `<h3>🚫 Tidak Followback (${notFollowBack.length}):</h3>`;
-
-      if (notFollowBack.length === 0) {
-        resultsDiv.innerHTML += `<p style="color:#aaa;">Semua mengikuti balik, aman 🔒</p>`;
-        return;
-      }
-
+    if (notFollowBack.length === 0) {
+      resultsDiv.innerHTML += `<p>Semua follow balik 🔒</p>`;
+    } else {
       notFollowBack.forEach(username => {
         const div = document.createElement('div');
         div.className = 'user-link';
@@ -169,6 +125,11 @@
         resultsDiv.appendChild(div);
       });
     }
+  } catch (err) {
+    resultsDiv.innerHTML = `<p style="color:red">❌ Gagal membaca ZIP: ${err.message}</p>`;
+  }
+}
+
   </script>
 </body>
 </html>
