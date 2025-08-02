@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cek Unfollow Instagram</title>
+  <title>Pemeriksa Unfollow Instagram</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://unpkg.com/heroicons@2.0.16/dist/24/outline/file-arrow-up.svg"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * {
@@ -16,10 +15,13 @@
       font-family: 'Inter', sans-serif;
       background: #e9f2ff;
       color: #333;
+      height: 100vh;
+      overflow: hidden;
     }
     .page {
       display: none;
-      min-height: 100vh;
+      height: 100vh;
+      display: flex;
       justify-content: center;
       align-items: center;
       padding: 20px;
@@ -30,11 +32,11 @@
     }
     .card {
       background: white;
-      border-radius: 25px;
+      border-radius: 20px;
       padding: 35px 25px;
       box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
       width: 100%;
-      max-width: 420px;
+      max-width: 400px;
       text-align: center;
     }
     .card h1 {
@@ -45,8 +47,8 @@
     }
     .upload-box {
       border: 2px dashed #2d7cff;
-      padding: 40px 20px;
-      border-radius: 18px;
+      padding: 35px 20px;
+      border-radius: 15px;
       cursor: pointer;
       color: #2d7cff;
       margin-bottom: 20px;
@@ -55,9 +57,9 @@
     .upload-box:hover {
       background-color: #f5faff;
     }
-    .upload-box img {
-      width: 48px;
-      height: 48px;
+    .upload-box svg {
+      width: 50px;
+      height: 50px;
       margin-bottom: 10px;
     }
     input[type="file"] {
@@ -106,9 +108,9 @@
     }
     footer {
       text-align: center;
-      padding: 20px;
+      padding: 15px;
       color: #666;
-      font-size: 14px;
+      font-size: 13px;
     }
     footer a {
       color: #2d7cff;
@@ -120,10 +122,13 @@
 
 <div class="page active" id="page-upload">
   <div class="card">
-    <h1>Cek Unfollow IG</h1>
+    <h1>Pemeriksa Unfollow IG</h1>
     <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-      <img src="https://www.svgrepo.com/show/488500/upload.svg" alt="Upload Icon">
-      <div>Tap sini buat upload file ZIP</div>
+      <!-- Inline SVG icon upload -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M4 12l8-8m0 0l8 8m-8-8v12" />
+      </svg>
+      <div>Ketuk di sini untuk mengunggah file ZIP</div>
     </div>
     <input type="file" id="fileInput" accept=".zip" onchange="handleZip(event)" />
   </div>
@@ -131,16 +136,16 @@
 
 <div class="page" id="page-results">
   <div class="card">
-    <h1>Hasil Analisis</h1>
+    <h1>Hasil Pemeriksaan</h1>
     <div class="results" id="results">
       <div class="loader"></div>
     </div>
-    <button onclick="goBack()">⬅ Balik ke Upload</button>
+    <button onclick="goBack()">⬅ Kembali ke Unggah</button>
   </div>
 </div>
 
 <footer>
-  Dibuat santai sama <a href="https://instagram.com/savero_aja" target="_blank">
+  Dibuat oleh <a href="https://instagram.com/savero_aja" target="_blank">
     <img src="https://cdn-icons-png.flaticon.com/24/2111/2111463.png" width="14" style="vertical-align:middle;"> @savero_aja
   </a>
 </footer>
@@ -160,7 +165,7 @@
     document.getElementById("page-results").classList.add("active");
 
     const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = `<p>Lagi baca file <b>${file.name}</b>...</p><div class="loader"></div>`;
+    resultsDiv.innerHTML = `<p>Memproses file <b>${file.name}</b>...</p><div class="loader"></div>`;
 
     try {
       const zip = await JSZip.loadAsync(file);
@@ -168,7 +173,7 @@
       const followersHTML = await zip.file(/followers(_1)?\.html$/i)[0]?.async('string');
 
       if (!followingHTML || !followersHTML) {
-        resultsDiv.innerHTML = `<p style="color:red">File HTML ga ketemu ya.. 😢</p>`;
+        resultsDiv.innerHTML = `<p style="color:red">File HTML tidak ditemukan.</p>`;
         return;
       }
 
@@ -181,10 +186,10 @@
 
       const notFollowBack = following.filter(u => !followers.includes(u));
 
-      resultsDiv.innerHTML = `<h3>🚫 Ga Follow Balik (${notFollowBack.length})</h3>`;
+      resultsDiv.innerHTML = `<h3>Pengguna yang Tidak Mengikuti Balik (${notFollowBack.length})</h3>`;
 
       if (notFollowBack.length === 0) {
-        resultsDiv.innerHTML += `<p>Wah, semua orang follow balik 😎👍</p>`;
+        resultsDiv.innerHTML += `<p>Semua pengguna mengikuti Anda kembali.</p>`;
       } else {
         notFollowBack.forEach(username => {
           const div = document.createElement('div');
@@ -194,7 +199,7 @@
         });
       }
     } catch (err) {
-      resultsDiv.innerHTML = `<p style="color:red">❌ Gagal baca file: ${err.message}</p>`;
+      resultsDiv.innerHTML = `<p style="color:red">Terjadi kesalahan saat memproses file: ${err.message}</p>`;
     }
   }
 </script>
