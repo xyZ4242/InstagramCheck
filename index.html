@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Instagram Unfollow Checker</title>
+  <title>Instagram Unfflow</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -16,100 +15,98 @@
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
-    }
+    }header {
+  width: 100%;
+  padding: 20px;
+  text-align: center;
+  background: linear-gradient(135deg, #8e2de2, #ff0080);
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(142, 45, 226, 0.4);
+}
 
-    header {
-      width: 100%;
-      padding: 20px;
-      text-align: center;
-      background: linear-gradient(135deg, #8e2de2, #ff0080);
-      font-size: 24px;
-      font-weight: bold;
-      color: #fff;
-      box-shadow: 0 4px 15px rgba(142, 45, 226, 0.4);
-    }
+.container {
+  width: 90%;
+  max-width: 400px;
+  margin-top: 50px;
+  background: #1a1a1a;
+  border-radius: 20px;
+  padding: 30px 20px;
+  box-shadow: 0 0 25px rgba(255, 0, 128, 0.1);
+  text-align: center;
+}
 
-    .container {
-      width: 90%;
-      max-width: 800px;
-      margin-top: 40px;
-      background: #1a1a1a;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 0 30px rgba(142, 45, 226, 0.2);
-    }
+.upload-section {
+  border: 2px dashed #8e2de2;
+  padding: 30px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 25px;
+  background-color: #131313;
+  transition: background 0.3s;
+}
 
-    .upload-section {
-      text-align: center;
-      border: 2px dashed #8e2de2;
-      padding: 40px;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-bottom: 30px;
-      transition: background 0.3s;
-    }
+.upload-section:hover {
+  background: rgba(142, 45, 226, 0.08);
+}
 
-    .upload-section:hover {
-      background: rgba(142, 45, 226, 0.05);
-    }
+input[type="file"] {
+  display: none;
+}
 
-    input[type="file"] {
-      display: none;
-    }
+.results {
+  margin-top: 20px;
+}
 
-    .results {
-      margin-top: 20px;
-    }
+.loader {
+  border: 4px solid #333;
+  border-top: 4px solid #ff0080;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
 
-    .user-link {
-      padding: 10px;
-      border-bottom: 1px solid #333;
-      font-size: 16px;
-    }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-    .user-link a {
-      color: #ff5de6;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
+footer {
+  margin-top: auto;
+  padding: 20px;
+  font-size: 14px;
+  color: #aaa;
+}
 
-    .user-link a:hover {
-      color: #c43ad6;
-    }
+.ig-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #ff5de6;
+  text-decoration: none;
+}
 
-    .loader {
-      border: 4px solid #333;
-      border-top: 4px solid #8e2de2;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      animation: spin 1s linear infinite;
-      margin: auto;
-    }
+.ig-link:hover {
+  color: #c43ad6;
+}
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 15px;
-      }
-    }
   </style>
 </head>
 <body>
-  <header>Instagram Unfollow Checker</header>
-  <div class="container">
+  <header>Instagram Unfollow</header>  <div class="container">
     <div class="upload-section" onclick="document.getElementById('fileInput').click()">
       <p>📂 Click or Drop ZIP / JSON / HTML File Here</p>
       <input type="file" id="fileInput" accept=".zip,.json,.html" onchange="handleFile(event)" />
     </div>
     <div class="results" id="results"></div>
-  </div>
-
-  <script>
+  </div>  <footer>
+    Built by <a class="ig-link" href="https://instagram.com/savero_aja" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="IG" width="16" height="16" style="filter: brightness(0) invert(1);"> @savero_aja
+    </a>
+  </footer>  <script>
     function handleFile(event) {
       const file = event.target.files[0];
       const resultsDiv = document.getElementById('results');
@@ -118,21 +115,10 @@
         <div class="loader"></div>
       `;
 
-      // Simulasi hasil deteksi
+      // Placeholder (tidak ada dummy user)
       setTimeout(() => {
-        const dummyUsers = [
-          "akulahroyy", "cryptowaveid", "istgursocute", "janice.kaori",
-          "najwanaufalll", "rere_nopianti", "syiifaaaptr_", "winchan.17_"
-        ];
-        resultsDiv.innerHTML = "<h3>🚫 Tidak Followback:</h3>";
-        dummyUsers.forEach(username => {
-          const div = document.createElement('div');
-          div.className = 'user-link';
-          div.innerHTML = `<a href="https://instagram.com/${username}" target="_blank">@${username}</a>`;
-          resultsDiv.appendChild(div);
-        });
+        resultsDiv.innerHTML = "<h3>🚫 Tidak Followback:</h3><p style='color:#777;'>(Belum ada data, upload file dulu)</p>";
       }, 1500);
     }
-  </script>
-</body>
+  </script></body>
 </html>
