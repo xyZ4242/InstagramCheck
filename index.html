@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -20,10 +19,15 @@
       justify-content: center;
       align-items: center;
       padding: 20px;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
     .active {
       display: flex;
       flex-direction: column;
+      opacity: 1;
+      transform: scale(1);
     }
     .card {
       background: white;
@@ -116,50 +120,46 @@
     }
   </style>
 </head>
-<body>
-
-<div class="page active" id="page-upload">
+<body><div class="page active" id="page-upload">
   <div class="card">
     <h1>Pemeriksa Unfollow Instagram</h1>
     <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-      <!-- SVG-->
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-        d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16" />
-</svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16" />
+      </svg>
       Klik di sini untuk mengunggah file ZIP
     </div>
     <input type="file" id="fileInput" accept=".zip" onchange="handleZip(event)" />
   </div>
-</div>
-
-<div class="page" id="page-results">
+</div><div class="page" id="page-results">
   <div class="card">
     <h1>Hasil Analisis</h1>
     <div class="results" id="results">
       <div class="loader"></div>
     </div>
     <button onclick="goBack()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
-       stroke="currentColor" width="20" height="20">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-          d="M15 19l-7-7 7-7" />
-  </svg>
-  Kembali
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Kembali
     </button>
   </div>
-</div>
-
-<footer>
+</div><footer>
   Dibuat oleh <a href="https://instagram.com/savero_aja" target="_blank">
     <img src="https://cdn-icons-png.flaticon.com/24/2111/2111463.png" width="16" style="vertical-align:middle;"> @savero_aja
-  </a>
-</footer>
+  </a> &middot; <a href="https://github.com/xyz4242" target="_blank">xyz4242</a>
+</footer><script>
+  function transitionPage(fromId, toId) {
+    const fromPage = document.getElementById(fromId);
+    const toPage = document.getElementById(toId);
+    fromPage.classList.remove("active");
+    setTimeout(() => {
+      toPage.classList.add("active");
+    }, 100); // delay to allow opacity out first
+  }
 
-<script>
   function goBack() {
-    document.getElementById("page-upload").classList.add("active");
-    document.getElementById("page-results").classList.remove("active");
+    transitionPage("page-results", "page-upload");
     document.getElementById("results").innerHTML = `<div class="loader"></div>`;
   }
 
@@ -167,8 +167,7 @@
     const file = event.target.files[0];
     if (!file) return;
 
-    document.getElementById("page-upload").classList.remove("active");
-    document.getElementById("page-results").classList.add("active");
+    transitionPage("page-upload", "page-results");
 
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = `<p>Membaca file <b>${file.name}</b>...</p><div class="loader"></div>`;
@@ -208,7 +207,5 @@
       resultsDiv.innerHTML = `<p style="color:red">❌ Gagal membaca file ZIP: ${err.message}</p>`;
     }
   }
-</script>
-
-</body>
+</script></body>
 </html>
