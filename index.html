@@ -5,6 +5,7 @@
   <title>Pemeriksa Unfollow Instagram</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     body {
@@ -78,6 +79,10 @@
       width: 100%;
       margin-top: 15px;
       transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
     button:hover {
       background: #3c8de9;
@@ -85,6 +90,9 @@
     .results h3 {
       margin-top: 0;
       color: #4d9eff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .user-link {
       border-bottom: 1px solid #eee;
@@ -117,95 +125,107 @@
     footer a {
       color: #4d9eff;
       text-decoration: none;
+      margin: 0 5px;
+    }
+    .footer-icons img {
+      vertical-align: middle;
+      width: 18px;
+      margin-right: 5px;
     }
   </style>
 </head>
-<body><div class="page active" id="page-upload">
-  <div class="card">
-    <h1>Pemeriksa Unfollow Instagram</h1>
-    <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16" />
-      </svg>
-      Klik di sini untuk mengunggah file ZIP
+<body>
+  <div class="page active" id="page-upload">
+    <div class="card">
+      <h1>Pemeriksa Unfollow Instagram</h1>
+      <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16" />
+        </svg>
+        Klik di sini untuk mengunggah file ZIP
+      </div>
+      <input type="file" id="fileInput" accept=".zip" onchange="handleZip(event)" />
     </div>
-    <input type="file" id="fileInput" accept=".zip" onchange="handleZip(event)" />
-  </div>
-</div><div class="page" id="page-results">
-  <div class="card">
-    <h1>Hasil Analisis</h1>
-    <div class="results" id="results">
-      <div class="loader"></div>
+  </div>  <div class="page" id="page-results">
+    <div class="card">
+      <h1>Hasil Analisis</h1>
+      <div class="results" id="results">
+        <div class="loader"></div>
+      </div>
+      <button onclick="goBack()">
+        <i class="bi bi-arrow-left"></i>
+        Kembali
+      </button>
     </div>
-    <button onclick="goBack()" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-      </svg>
-      Kembali
-    </button>
-  </div>
-</div><footer>
-  Dibuat oleh <a href="https://instagram.com/savero_aja" target="_blank">
-    <img src="https://cdn-icons-png.flaticon.com/24/2111/2111463.png" width="16" style="vertical-align:middle;"> @savero_aja
-  </a> &middot; <a href="https://github.com/xyz4242" target="_blank">xyz4242</a>
-</footer><script>
-  function transitionPage(fromId, toId) {
-    const fromPage = document.getElementById(fromId);
-    const toPage = document.getElementById(toId);
-    fromPage.classList.remove("active");
-    setTimeout(() => {
-      toPage.classList.add("active");
-    }, 100); // delay to allow opacity out first
-  }
-
-  function goBack() {
-    transitionPage("page-results", "page-upload");
-    document.getElementById("results").innerHTML = `<div class="loader"></div>`;
-  }
-
-  async function handleZip(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    transitionPage("page-upload", "page-results");
-
-    const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = `<p>Membaca file <b>${file.name}</b>...</p><div class="loader"></div>`;
-
-    try {
-      const zip = await JSZip.loadAsync(file);
-      const followingHTML = await zip.file(/following\.html$/i)[0]?.async('string');
-      const followersHTML = await zip.file(/followers(_1)?\.html$/i)[0]?.async('string');
-
-      if (!followingHTML || !followersHTML) {
-        resultsDiv.innerHTML = `<p style="color:red">File HTML tidak ditemukan. Pastikan kamu pilih file ZIP yang benar.</p>`;
-        return;
-      }
-
-      const parser = new DOMParser();
-      const docFollowing = parser.parseFromString(followingHTML, 'text/html');
-      const docFollowers = parser.parseFromString(followersHTML, 'text/html');
-
-      const following = [...docFollowing.querySelectorAll('a')].map(a => a.textContent.trim());
-      const followers = [...docFollowers.querySelectorAll('a')].map(a => a.textContent.trim());
-
-      const notFollowBack = following.filter(u => !followers.includes(u));
-
-      resultsDiv.innerHTML = `<h3>🚫 Tidak Mengikuti Balik (${notFollowBack.length})</h3>`;
-
-      if (notFollowBack.length === 0) {
-        resultsDiv.innerHTML += `<p>Selamat! Semua akun mengikuti kamu kembali 🎉</p>`;
-      } else {
-        notFollowBack.forEach(username => {
-          const div = document.createElement('div');
-          div.className = 'user-link';
-          div.innerHTML = `<a href="https://instagram.com/${username}" target="_blank">@${username}</a>`;
-          resultsDiv.appendChild(div);
-        });
-      }
-    } catch (err) {
-      resultsDiv.innerHTML = `<p style="color:red">❌ Gagal membaca file ZIP: ${err.message}</p>`;
+  </div>  <footer>
+    <div class="footer-icons">
+      Dibuat oleh 
+      <a href="https://instagram.com/savero_aja" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram"> @savero_aja
+      </a>
+      &middot;
+      <a href="https://github.com/xyz4242" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733553.png" alt="GitHub"> xyz4242
+      </a>
+    </div>
+  </footer>  <script>
+    function transitionPage(fromId, toId) {
+      const fromPage = document.getElementById(fromId);
+      const toPage = document.getElementById(toId);
+      fromPage.classList.remove("active");
+      setTimeout(() => {
+        toPage.classList.add("active");
+      }, 100);
     }
-  }
-</script></body>
+
+    function goBack() {
+      transitionPage("page-results", "page-upload");
+      document.getElementById("results").innerHTML = `<div class="loader"></div>`;
+    }
+
+    async function handleZip(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      transitionPage("page-upload", "page-results");
+
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = `<p><i class="bi bi-file-earmark-zip"></i> Membaca file <b>${file.name}</b>...</p><div class="loader"></div>`;
+
+      try {
+        const zip = await JSZip.loadAsync(file);
+        const followingHTML = await zip.file(/following\.html$/i)[0]?.async('string');
+        const followersHTML = await zip.file(/followers(_1)?\.html$/i)[0]?.async('string');
+
+        if (!followingHTML || !followersHTML) {
+          resultsDiv.innerHTML = `<p style="color:red"><i class="bi bi-x-circle"></i> File HTML tidak ditemukan. Pastikan kamu pilih file ZIP yang benar.</p>`;
+          return;
+        }
+
+        const parser = new DOMParser();
+        const docFollowing = parser.parseFromString(followingHTML, 'text/html');
+        const docFollowers = parser.parseFromString(followersHTML, 'text/html');
+
+        const following = [...docFollowing.querySelectorAll('a')].map(a => a.textContent.trim());
+        const followers = [...docFollowers.querySelectorAll('a')].map(a => a.textContent.trim());
+
+        const notFollowBack = following.filter(u => !followers.includes(u));
+
+        resultsDiv.innerHTML = `<h3><i class="bi bi-person-dash"></i> Tidak Mengikuti Balik (${notFollowBack.length})</h3>`;
+
+        if (notFollowBack.length === 0) {
+          resultsDiv.innerHTML += `<p><i class="bi bi-emoji-smile"></i> Selamat! Semua akun mengikuti kamu kembali</p>`;
+        } else {
+          notFollowBack.forEach(username => {
+            const div = document.createElement('div');
+            div.className = 'user-link';
+            div.innerHTML = `<a href="https://instagram.com/${username}" target="_blank">@${username}</a>`;
+            resultsDiv.appendChild(div);
+          });
+        }
+      } catch (err) {
+        resultsDiv.innerHTML = `<p style="color:red"><i class="bi bi-exclamation-triangle"></i> Gagal membaca file ZIP: ${err.message}</p>`;
+      }
+    }
+  </script></body>
 </html>
