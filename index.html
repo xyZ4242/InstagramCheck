@@ -54,10 +54,11 @@
     .upload-box:hover {
       background: #f0f7ff;
     }
-    .upload-box img {
+    .upload-box svg {
       width: 48px;
       height: 48px;
       margin-bottom: 12px;
+      stroke: #4d9eff;
     }
     input[type="file"] {
       display: none;
@@ -121,7 +122,10 @@
   <div class="card">
     <h1>Pemeriksa Unfollow Instagram</h1>
     <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-      <img src="https://unpkg.com/heroicons@2.0.18/24/outline/folder-arrow-up.svg" alt="Upload Icon" />
+      <!-- INLINE SVG ICON -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0l-4 4m4-4l4 4m-7 6h10m-6 4h.01" />
+      </svg>
       Klik di sini untuk mengunggah file ZIP
     </div>
     <input type="file" id="fileInput" accept=".zip" onchange="handleZip(event)" />
@@ -167,7 +171,7 @@
       const followersHTML = await zip.file(/followers(_1)?\.html$/i)[0]?.async('string');
 
       if (!followingHTML || !followersHTML) {
-        resultsDiv.innerHTML = `<p style="color:red">File HTML tidak ditemukan. Pastikan Anda memilih file ZIP yang benar.</p>`;
+        resultsDiv.innerHTML = `<p style="color:red">File HTML tidak ditemukan. Pastikan kamu pilih file ZIP yang benar.</p>`;
         return;
       }
 
@@ -180,10 +184,10 @@
 
       const notFollowBack = following.filter(u => !followers.includes(u));
 
-      resultsDiv.innerHTML = `<h3>🚫 Pengguna yang Tidak Mengikuti Kembali (${notFollowBack.length})</h3>`;
+      resultsDiv.innerHTML = `<h3>🚫 Tidak Mengikuti Balik (${notFollowBack.length})</h3>`;
 
       if (notFollowBack.length === 0) {
-        resultsDiv.innerHTML += `<p>Selamat! Semua pengguna mengikuti Anda kembali 🔒</p>`;
+        resultsDiv.innerHTML += `<p>Selamat! Semua akun mengikuti kamu kembali 🎉</p>`;
       } else {
         notFollowBack.forEach(username => {
           const div = document.createElement('div');
@@ -193,7 +197,7 @@
         });
       }
     } catch (err) {
-      resultsDiv.innerHTML = `<p style="color:red">❌ Terjadi kesalahan saat membaca file ZIP: ${err.message}</p>`;
+      resultsDiv.innerHTML = `<p style="color:red">❌ Gagal membaca file ZIP: ${err.message}</p>`;
     }
   }
 </script>
